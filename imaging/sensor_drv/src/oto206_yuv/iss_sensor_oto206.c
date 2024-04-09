@@ -59,19 +59,19 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#include "iss_sensor_gw_ar0233.h"
-#include "ub9xx_gw_ar0233_serdes_config.h"
+#include "iss_sensor_oto206.h"
+#include "ub9xx_oto206_serdes_config.h"
 
-static IssSensor_CreateParams  gw_ar0233CreatePrms = {
-    GW_AR0233_UYVY,     /*sensor name*/
+static IssSensor_CreateParams  oto206CreatePrms = {
+    OTO206_UYVY,     /*sensor name*/
     0x6,                             /*i2cInstId*/
-    {0, 0, 0, 0, 0, 0, 0, 0},   /*i2cAddrSensor*/
-    {0, 0, 0, 0, 0, 0, 0, 0},      /*i2cAddrSer*/
+    {SENSOR_0_I2C_ALIAS, SENSOR_1_I2C_ALIAS, SENSOR_2_I2C_ALIAS, SENSOR_3_I2C_ALIAS, 0, 0, 0, 0},   /*i2cAddrSensor*/
+    {SER_0_I2C_ALIAS, SER_1_I2C_ALIAS, SER_2_I2C_ALIAS, SER_3_I2C_ALIAS, 0, 0, 0, 0},      /*i2cAddrSer*/
     /*IssSensor_Info*/
     {
         {
-            GW_AR0233_OUT_WIDTH,               /*width*/
-            GW_AR0233_OUT_HEIGHT,              /*height*/
+            OTO206_OUT_WIDTH,               /*width*/
+            OTO206_OUT_HEIGHT,              /*height*/
             1,                              /*num_exposures*/
             vx_false_e,                     /*line_interleaved*/
             {
@@ -80,74 +80,85 @@ static IssSensor_CreateParams  gw_ar0233CreatePrms = {
             0,                              /*meta_height_before*/
             0,                              /*meta_height_after*/
         },
-        ISS_SENSOR_GW_AR0233_FEATURES,     /*features*/
+        ISS_SENSOR_OTO206_FEATURES,     /*features*/
         ALGORITHMS_ISS_AEWB_MODE_NONE,  /*aewbMode*/
-        60,                             /*fps*/
+        30,                             /*fps*/
         4,                              /*numDataLanes*/
         {1, 2, 3, 4},                   /*dataLanesMap*/
         {0, 0, 0, 0},                   /*dataLanesPolarity*/
-        CSIRX_LANE_BAND_SPEED_720_TO_800_MBPS, /*csi_laneBandSpeed*/
+        800,                            /*CSI Clock*/
     },
-    1,                                  /*numChan*/
-    5233,                                /*dccId*/
+    8,                                  /*numChan*/
+    206,                                /*dccId*/
 };
 
-static IssSensorFxns           gw_ar0233SensorFxns = {
-    gw_ar0233_Probe,
-    gw_ar0233_Config,
-    gw_ar0233_StreamOn,
-    gw_ar0233_StreamOff,
-    gw_ar0233_PowerOn,
-    gw_ar0233_PowerOff,
+static IssSensorFxns           oto206SensorFxns = {
+    oto206_Probe,
+    oto206_Config,
+    oto206_StreamOn,
+    oto206_StreamOff,
+    oto206_PowerOn,
+    oto206_PowerOff,
     NULL,
     NULL,
-    gw_ar0233_GetDccParams,
-    gw_ar0233_InitAewbConfig,
+    oto206_GetDccParams,
+    oto206_InitAewbConfig,
     NULL,
     NULL,
     NULL,
-    gw_ar0233_deinit,
+    oto206_deinit,
     NULL,
     NULL
 };
 
-static IssSensorIntfParams     gw_ar0233SensorIntfPrms = {
+static IssSensorIntfParams     oto206SensorIntfPrms = {
+    0,                                /*isMultiChannel*/
+    4,                              /*numCSI2Lanes*/
+    1,                              /*inCsi2VirtualChanNum*/
+    1,                /* isCplxCfgValid */
+     {
+        {0, 1}, /* Clock Lane */
+        {0, 2}, /* data1Lane */
+        {0, 3}, /* data2Lane */
+        {0, 4}, /* data3Lane*/
+        {0, 5}, /* data4Lane */
+    },
+    800,                 /* csi2PhyClk */ 
     0,             /*sensorBroadcast*/
     0,             /*enableFsin*/
-    0,			   /*numCamerasStreaming*/
 };
 
-IssSensorConfig     gw_ar0233SensorRegConfig = {
-    NULL,     /*desCfgPreScript*/
-    ub9xxSerCfg_GW_AR0233,      /*serCfgPreScript*/
+IssSensorConfig     oto206SensorRegConfig = {
+    ub9xxDesCfg_OTO206,     /*desCfgPreScript*/
+    ub9xxSerCfg_OTO206,      /*serCfgPreScript*/
     NULL,      /*sensorCfgPreScript*/
-    ub9xxGW_AR0233DesCSI2Enable,        /*desCfgPostScript*/
+    ub9xxOTO206DesCSI2Enable,        /*desCfgPostScript*/
     NULL,                    /*serCfgPostScript*/
     NULL,                    /*sensorCfgPostScript*/
 };
 
 
-IssSensors_Handle gw_ar0233SensorHandle = {
+IssSensors_Handle oto206SensorHandle = {
     1,                                 /*isUsed*/
-    &gw_ar0233CreatePrms,                /*CreatePrms*/
-    &gw_ar0233SensorFxns,                /*SensorFxns*/
-    &gw_ar0233SensorIntfPrms,            /*SensorIntfPrms*/
+    &oto206CreatePrms,                /*CreatePrms*/
+    &oto206SensorFxns,                /*SensorFxns*/
+    &oto206SensorIntfPrms,            /*SensorIntfPrms*/
 };
 
 /*
- * \brief DCC Parameters of gw_ar0233
+ * \brief DCC Parameters of oto206
  */
-IssCapture_CmplxIoLaneCfg           gw_ar0233Csi2CmplxIoLaneCfg;
+IssCapture_CmplxIoLaneCfg           oto206Csi2CmplxIoLaneCfg;
 
 extern IssSensors_Handle * gIssSensorTable[ISS_SENSORS_MAX_SUPPORTED_SENSOR];
 
-int32_t IssSensor_gw_ar0233_Init()
+int32_t IssSensor_oto206_Init()
 {
     int32_t status;
-    status = IssSensor_Register(&gw_ar0233SensorHandle);
+    status = IssSensor_Register(&oto206SensorHandle);
     if(0 != status)
     {
-        printf("IssSensor_gw_ar0233_Init failed \n");
+        printf("IssSensor_oto206_Init failed \n");
     }
 
     return status;
@@ -158,19 +169,13 @@ int32_t IssSensor_gw_ar0233_Init()
  *******************************************************************************
  */
 
-static int32_t gw_ar0233_Probe(uint32_t chId, void *pSensorHdl)
+static int32_t oto206_Probe(uint32_t chId, void *pSensorHdl)
 {
-	/*
-		Probe is used only for detecting cameras connected to an FPD Link port. 
-		There is no reliable way of detecting this camera. 
-		Always return -1 to indicate autodetect failed.
-		If needed, user can manually select this sensor from application menu.
-	*/
     int32_t status = -1;
     return (status);
 }
 
-static int32_t gw_ar0233_Config(uint32_t chId, void *pSensorHdl, uint32_t sensor_features_requested)
+static int32_t oto206_Config(uint32_t chId, void *pSensorHdl, uint32_t sensor_features_requested)
 {
     int32_t status = 0;
     I2cParams *deserCfg = NULL;
@@ -179,25 +184,21 @@ static int32_t gw_ar0233_Config(uint32_t chId, void *pSensorHdl, uint32_t sensor
     uint32_t i2cInstId;
     IssSensors_Handle * pSenHandle = (IssSensors_Handle*)pSensorHdl;
     IssSensor_CreateParams * pCreatePrms;
-	uint8_t chNum = 0, i2cAddr = 0;	// MD add
+	uint8_t chNum = 0, i2cAddr = 0;
     assert(NULL != pSenHandle);
     pCreatePrms = pSenHandle->createPrms;
     assert(NULL != pCreatePrms);
 
-    deserCfg = gw_ar0233SensorRegConfig.desCfgPreScript;
-    serCfg = gw_ar0233SensorRegConfig.serCfgPreScript;
-    
-#if 1	// MD add
-    if(ub9xxInstanceId < 0)
+    deserCfg =oto206SensorRegConfig.desCfgPreScript;
+    serCfg = oto206SensorRegConfig.serCfgPreScript;
+	if(ub9xxInstanceId < 0)
     {
-        printf("gw_ar0233_Config Invalid ub960InstanceId \n");
+        printf("oto206_Config Invalid ub960InstanceId \n");
         return -1;
     }
-    Board_fpdU960GetI2CAddr(&chNum, &i2cAddr, ub9xxInstanceId);
+	Board_fpdU960GetI2CAddr(&chNum, &i2cAddr, ub9xxInstanceId);
+printf("Jireh: func:%s(), line:%d, chNum:%d, i2cAddr:%d\n", __FUNCTION__, __LINE__, chNum, i2cAddr);
     i2cInstId = (uint32_t)chNum;
-#else
-    i2cInstId = pCreatePrms->i2cInstId;
-#endif
 
     if(NULL != deserCfg)
     {
@@ -215,7 +216,7 @@ static int32_t gw_ar0233_Config(uint32_t chId, void *pSensorHdl, uint32_t sensor
     return (status);
 }
 
-static int32_t gw_ar0233_StreamOn(uint32_t chId, void *pSensorHdl)
+static int32_t oto206_StreamOn(uint32_t chId, void *pSensorHdl)
 {
     int32_t status = 0;
     int8_t ub9xxInstanceId = getUB960InstIdFromChId(chId);
@@ -227,11 +228,11 @@ static int32_t gw_ar0233_StreamOn(uint32_t chId, void *pSensorHdl)
     }
 
     /*Start Streaming*/
-    status |= ub960_cfgScript(ub9xxGW_AR0233DesCSI2Enable, ub9xxInstanceId);
+    status |= ub960_cfgScript(ub9xxOTO206DesCSI2Enable, ub9xxInstanceId);
     return (status);
 }
 
-static int32_t gw_ar0233_StreamOff(uint32_t chId, void *pSensorHdl)
+static int32_t oto206_StreamOff(uint32_t chId, void *pSensorHdl)
 {
     int32_t status = 0;
     int8_t ub9xxInstanceId = getUB960InstIdFromChId(chId);
@@ -243,34 +244,34 @@ static int32_t gw_ar0233_StreamOff(uint32_t chId, void *pSensorHdl)
     }
 
     /*Stop Streaming*/
-    status |= ub960_cfgScript(ub9xxGW_AR0233DesCSI2Disable, ub9xxInstanceId);
+    status |= ub960_cfgScript(ub9xxOTO206DesCSI2Disable, ub9xxInstanceId);
     return (status);
 }
 
-static int32_t gw_ar0233_PowerOn(uint32_t chId, void *pSensorHdl)
+static int32_t oto206_PowerOn(uint32_t chId, void *pSensorHdl)
 {
     int32_t status = 0;
     return status;
 }
 
-static int32_t gw_ar0233_PowerOff(uint32_t chId, void *pSensorHdl)
+static int32_t oto206_PowerOff(uint32_t chId, void *pSensorHdl)
 {
     int32_t status = 0;
     return (status);
 }
 
-static int32_t gw_ar0233_GetDccParams(uint32_t chId, void *pSensorHdl, IssSensor_DccParams *pDccPrms)
+static int32_t oto206_GetDccParams(uint32_t chId, void *pSensorHdl, IssSensor_DccParams *pDccPrms)
 {
     int32_t status = 0;
     return (status);
 }
 
-static void gw_ar0233_InitAewbConfig(uint32_t chId, void *pSensorHdl)
+static void oto206_InitAewbConfig(uint32_t chId, void *pSensorHdl)
 {
     return;
 }
 
-static void gw_ar0233_deinit (uint32_t chId, void *pSensorHdl)
+static void oto206_deinit (uint32_t chId, void *pSensorHdl)
 {
     return;
 }

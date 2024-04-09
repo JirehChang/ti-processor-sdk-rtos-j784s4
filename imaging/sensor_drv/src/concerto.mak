@@ -10,6 +10,7 @@ CSOURCES    += ar0820/iss_sensor_ar0820.c
 CSOURCES    += ub9xx_raw_test_pattern/iss_sensor_raw_testpat.c
 CSOURCES    += ub9xx_yuv_test_pattern/iss_sensor_testpat.c
 CSOURCES    += gw_ar0233_yuv/iss_sensor_gw_ar0233.c
+CSOURCES    += oto206_yuv/iss_sensor_oto206.c
 
 IDIRS       += $(HOST_ROOT)/sensor_drv/include
 IDIRS       += $(APP_UTILS_PATH)/utils/remote_service/include

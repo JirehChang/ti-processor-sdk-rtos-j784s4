@@ -639,6 +639,7 @@ int32_t IssSensor_Init()
     status |= IssSensor_rawtestpat_Init();
     status |= IssSensor_testpat_Init();
     status |= IssSensor_gw_ar0233_Init();
+	status |= IssSensor_oto206_Init();	// MD add
 
     return status;
 }

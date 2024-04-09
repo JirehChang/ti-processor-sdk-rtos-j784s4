@@ -59,72 +59,85 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef ISS_SENSORS_PRIV_H_
-#define ISS_SENSORS_PRIV_H_
+#ifndef _UB96X_OTO206_SERDES_H_
+#define _UB96X_OTO206_SERDES_H_
 
-/*******************************************************************************
- *  Include files
- *******************************************************************************
- */
-#ifndef x86_64
-#include <ti/board/src/devices/board_devices.h>
-#include <ti/drv/i2c/I2C.h>
-#include <ti/drv/i2c/soc/I2C_soc.h>
-#include <ti/board/src/devices/common/common.h>
-#include <ti/board/board.h>
-#include <ti/board/src/devices/board_devices.h>
-#include <ti/board/src/devices/fpd/ds90ub960.h>
+#define OTO206_OUT_WIDTH           (1280U)
+#define OTO206_OUT_HEIGHT          (800U)
 
-#include <app_remote_service.h>
-#include <app_ipc.h>
+#define OTO206_DES_CFG_SIZE    (40U)
+I2cParams ub9xxDesCfg_OTO206[OTO206_DES_CFG_SIZE] = {
 
-#include <ti/drv/csirx/soc/V0/csirx_soc.h>
+    /*TI960 4 input port,one output port*/
+    {0x01, 0x02, 0x1},  /*digital reset include registers*/
+    {0x1f, 0x01, 0x1},  /*0x02 800Mhz, 0x03 400Mhz,00 1.6GHz,01 1.2GHz*/
+    {0xbc, 0x00, 0x1},
+		
+	/*RX0 VC=0*/
+    {0x4C, 0x01, 0x1},
+	{0x58, 0x58, 0x1},   /*enable pass throu,Enable Back channel, set to 2.5Mbs for TI913*/
+	{0x6d, 0x7f, 0x1},   /*RAW10 mode for TI913,TI933*/
+	{0x7c, 0xc0, 0x1},   /*8-bit processing using lower 8 bits*/
+    /*{0x5b, 0xba, 0x1},    //this field is normally loaded automatically from remote Serializer*/
+    {0x5c, SER_0_I2C_ALIAS, 0x1},
+    {0x5d, 0x20, 0x1},    /*sensor physical IIC address*/
+    {0x65, SENSOR_0_I2C_ALIAS, 0x1},
+    {0x70, 0x1e, 0x1},
+	
+	/*RX1 VC=1*/
+    {0x4c, 0x12, 0x1},
+	{0x58, 0x58, 0x1},
+	{0x6d, 0x7f, 0x1},  /*RAW10 mode for TI913,TI933*/
+	{0x7c, 0xc0, 0x1},
+    /*{0x5b, 0xb0, 0x1},   //this field is normally loaded automatically from remote Serializer*/
+    {0x5c, SER_1_I2C_ALIAS, 0x1},
+    {0x5d, 0x20, 0x1},    /*sensor physical IIC address*/
+    {0x65, SENSOR_1_I2C_ALIAS, 0x1},
+    {0x70, 0x5e, 0x1},
+	
+	/*RX2 VC=2*/
+    {0x4c, 0x24, 0x1},
+	{0x58, 0x58, 0x1},
+	{0x6d, 0x7f, 0x1},    /*RAW10 mode for TI913,TI933*/
+	{0x7c, 0xc0, 0x1},
+    /*{0x5b, 0xb0, 0x1},    //this field is normally loaded automatically from remote Serializer*/
+    {0x5c, SER_2_I2C_ALIAS, 0x1},
+    {0x5d, 0x20, 0x1},   /*sensor physical IIC address*/
+    {0x65, SENSOR_2_I2C_ALIAS, 0x1},
+    {0x70, 0x9e, 0x1},
+	
+	/*RX3 VC=3*/
+    {0x4c, 0x38, 0x1},
+	{0x58, 0x58, 0x1},
+	{0x6d, 0x7f, 0x1},    /*RAW10 mode for TI913,TI933*/
+	{0x7c, 0xc0, 0x1},
+    /*{0x5b, 0xb0, 0x1},    //this field is normally loaded automatically from remote Serializer*/
+    {0x5c, SER_3_I2C_ALIAS, 0x1},
+    {0x5d, 0x20, 0x1},    /*sensor physical IIC address*/
+    {0x65, SENSOR_3_I2C_ALIAS},
+    {0x70, 0xde, 0x1},
 
+    {0x0c, 0x0f, 0x1},  /*RX_PORT_CTL:Enable All ports*/
+	{0x32, 0x1, 0x1},   /*CSI0 select */
+    {0x33, 0x2, 0x1},   /* CSI_EN & CSI0 4L,Enable Continuous clock mode and CSI output*/
+    {0x20, 0x0, 0x1},   /*forwarding of all RX to CSI0*/
+    {0xFFFF, 0x00, 0x0} /*End of script */
+};
 
-void appLogWaitMsecs(uint32_t time_in_msecs);
-void appLogPrintf(const char *format, ...);
+#define OTO206_SER_CFG_SIZE    (1U)
+I2cParams ub9xxSerCfg_OTO206[OTO206_SER_CFG_SIZE] = {
+    {0xFFFF, 0x00, 0x0} /*End of script */
+};
 
-// #define ENABLE_DEBUG_IMAGING
-#define ENABLE_DEBUG_IMAGING	// MD, for debug
+I2cParams ub9xxOTO206DesCSI2Enable[10u] = {
+    {0x33, 0x03, 0x1},
+    {0xFFFF, 0x00, 0x0} //End of script
+};
 
-#ifdef ENABLE_DEBUG_IMAGING
-#define issLogPrintf(f_, ...) appLogPrintf((f_), ##__VA_ARGS__)
-#else
-#define issLogPrintf(f_, ...)
-#endif
+I2cParams ub9xxOTO206DesCSI2Disable[2u] = {
+    {0x33, 0x02, 0x10},
+    {0xFFFF, 0x00, 0x0} /*End of script */
+};
 
-
-void getIssSensorI2cInfo(uint8_t * byteOrder, I2C_Handle * i2cHndl);
-
-int32_t ImageSensor_RemoteServiceHandler(char *service_name, uint32_t cmd,
-    void *prm, uint32_t prm_size, uint32_t flags);
-
-#endif
-
-
-/*******************************************************************************
- *  Defines
- *******************************************************************************
- */
-
-
-/*******************************************************************************
- *  Data structure's
- *******************************************************************************
- */
-
-
-/*******************************************************************************
- *  Functions Declarations
- *******************************************************************************
- */
-
-int32_t IssSensor_IMX390_Init();
-int32_t IssSensor_AR0233_Init();
-int32_t IssSensor_AR0820_Init();
-int32_t IssSensor_rawtestpat_Init();
-int32_t IssSensor_testpat_Init();
-int32_t IssSensor_gw_ar0233_Init();
-int32_t IssSensor_oto206_Init();	// MD add
-#endif /* End of ISS_SENSORS_PRIV_H_*/
+#endif /* _UB96X_OTO206_SERDES_H_ */
 

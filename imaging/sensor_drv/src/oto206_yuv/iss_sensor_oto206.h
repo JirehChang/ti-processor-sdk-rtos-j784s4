@@ -59,72 +59,29 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef ISS_SENSORS_PRIV_H_
-#define ISS_SENSORS_PRIV_H_
-
-/*******************************************************************************
- *  Include files
- *******************************************************************************
- */
-#ifndef x86_64
-#include <ti/board/src/devices/board_devices.h>
-#include <ti/drv/i2c/I2C.h>
-#include <ti/drv/i2c/soc/I2C_soc.h>
-#include <ti/board/src/devices/common/common.h>
-#include <ti/board/board.h>
-#include <ti/board/src/devices/board_devices.h>
-#include <ti/board/src/devices/fpd/ds90ub960.h>
-
-#include <app_remote_service.h>
-#include <app_ipc.h>
-
-#include <ti/drv/csirx/soc/V0/csirx_soc.h>
-
-
-void appLogWaitMsecs(uint32_t time_in_msecs);
-void appLogPrintf(const char *format, ...);
-
-// #define ENABLE_DEBUG_IMAGING
-#define ENABLE_DEBUG_IMAGING	// MD, for debug
-
-#ifdef ENABLE_DEBUG_IMAGING
-#define issLogPrintf(f_, ...) appLogPrintf((f_), ##__VA_ARGS__)
-#else
-#define issLogPrintf(f_, ...)
-#endif
-
-
-void getIssSensorI2cInfo(uint8_t * byteOrder, I2C_Handle * i2cHndl);
-
-int32_t ImageSensor_RemoteServiceHandler(char *service_name, uint32_t cmd,
-    void *prm, uint32_t prm_size, uint32_t flags);
-
-#endif
-
+#include <iss_sensors.h>
+#include <iss_sensor_priv.h>
+#include <iss_sensor_if.h>
+#include <iss_sensor_serdes.h>
 
 /*******************************************************************************
  *  Defines
  *******************************************************************************
  */
 
-
+#define ISS_SENSOR_OTO206_FEATURES      (ISS_SENSOR_FEATURE_DCC_SUPPORTED)
 /*******************************************************************************
- *  Data structure's
+ *  Local Functions Declarations
  *******************************************************************************
  */
 
-
-/*******************************************************************************
- *  Functions Declarations
- *******************************************************************************
- */
-
-int32_t IssSensor_IMX390_Init();
-int32_t IssSensor_AR0233_Init();
-int32_t IssSensor_AR0820_Init();
-int32_t IssSensor_rawtestpat_Init();
-int32_t IssSensor_testpat_Init();
-int32_t IssSensor_gw_ar0233_Init();
-int32_t IssSensor_oto206_Init();	// MD add
-#endif /* End of ISS_SENSORS_PRIV_H_*/
+static int32_t oto206_Probe(uint32_t chId, void *pSensorHdl);
+static int32_t oto206_Config(uint32_t chId, void *pSensorHdl, uint32_t sensor_features_requested);
+static int32_t oto206_StreamOn(uint32_t chId, void *pSensorHdl);
+static int32_t oto206_StreamOff(uint32_t chId, void *pSensorHdl);
+static int32_t oto206_PowerOn(uint32_t chId, void *pSensorHdl);
+static int32_t oto206_PowerOff(uint32_t chId, void *pSensorHdl);
+static int32_t oto206_GetDccParams(uint32_t chId, void *pSensorHdl, IssSensor_DccParams *pDccPrms);
+static void oto206_InitAewbConfig(uint32_t chId, void *pSensorHdl);
+static void oto206_deinit (uint32_t chId, void *pSensorHdl);
 

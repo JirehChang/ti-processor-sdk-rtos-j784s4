@@ -141,6 +141,7 @@ typedef enum
 #define UB96X_TESTPATTERN_UYVY                 "UB96x_UYVY_TESTPATTERN"
 #define GW_AR0233_UYVY                          "GW_AR0233_UYVY"
 #define SENSOR_OV2312_UB953_LI                  "OV2312-UB953_LI"
+#define OTO206_UYVY                          "OTO206_UYVY"	// MD add
 
 /*******************************************************************************
  *  Data structure's
