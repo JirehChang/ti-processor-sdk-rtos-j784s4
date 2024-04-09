@@ -63,10 +63,12 @@
 #include "ub9xx_oto206_serdes_config.h"
 
 static IssSensor_CreateParams  oto206CreatePrms = {
-    OTO206_UYVY,     /*sensor name*/
-    0x6,                             /*i2cInstId*/
-    {SENSOR_0_I2C_ALIAS, SENSOR_1_I2C_ALIAS, SENSOR_2_I2C_ALIAS, SENSOR_3_I2C_ALIAS, 0, 0, 0, 0},   /*i2cAddrSensor*/
-    {SER_0_I2C_ALIAS, SER_1_I2C_ALIAS, SER_2_I2C_ALIAS, SER_3_I2C_ALIAS, 0, 0, 0, 0},      /*i2cAddrSer*/
+    OTO206_UYVY,                 /*sensor name*/
+    0x6,                            /*i2cInstId, CSI0=0x3, CSI1=0x6*/
+    /*{0, 0, 0, 0, 0, 0, 0, 0},       i2cAddrSensor*/
+    /*{0, 0, 0, 0, 0, 0, 0, 0},       i2cAddrSer, ub953(0xb0, 8bits), MD modify */
+    {SENSOR_0_I2C_ALIAS, SENSOR_1_I2C_ALIAS, SENSOR_2_I2C_ALIAS, SENSOR_3_I2C_ALIAS,SENSOR_4_I2C_ALIAS, SENSOR_5_I2C_ALIAS, SENSOR_6_I2C_ALIAS, SENSOR_7_I2C_ALIAS},   /*i2cAddrSensor, MD modify */
+    {SER_0_I2C_ALIAS, SER_1_I2C_ALIAS, SER_2_I2C_ALIAS, SER_3_I2C_ALIAS, SER_4_I2C_ALIAS, SER_5_I2C_ALIAS, SER_6_I2C_ALIAS, SER_7_I2C_ALIAS},      /*i2cAddrSer, MD modify */
     /*IssSensor_Info*/
     {
         {
@@ -112,20 +114,9 @@ static IssSensorFxns           oto206SensorFxns = {
 };
 
 static IssSensorIntfParams     oto206SensorIntfPrms = {
-    0,                                /*isMultiChannel*/
-    4,                              /*numCSI2Lanes*/
-    1,                              /*inCsi2VirtualChanNum*/
-    1,                /* isCplxCfgValid */
-     {
-        {0, 1}, /* Clock Lane */
-        {0, 2}, /* data1Lane */
-        {0, 3}, /* data2Lane */
-        {0, 4}, /* data3Lane*/
-        {0, 5}, /* data4Lane */
-    },
-    800,                 /* csi2PhyClk */ 
     0,             /*sensorBroadcast*/
     0,             /*enableFsin*/
+    0,			/*   numCamerasStreaming*/
 };
 
 IssSensorConfig     oto206SensorRegConfig = {
