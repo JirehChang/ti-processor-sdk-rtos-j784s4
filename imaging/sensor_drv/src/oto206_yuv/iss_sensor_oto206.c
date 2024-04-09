@@ -86,9 +86,9 @@ static IssSensor_CreateParams  oto206CreatePrms = {
         4,                              /*numDataLanes*/
         {1, 2, 3, 4},                   /*dataLanesMap*/
         {0, 0, 0, 0},                   /*dataLanesPolarity*/
-        800,                            /*CSI Clock*/
+        CSIRX_LANE_BAND_SPEED_720_TO_800_MBPS, /*csi_laneBandSpeed*/
     },
-    8,                                  /*numChan*/
+    8,                                  /*numChan, MD modify*/
     206,                                /*dccId*/
 };
 
@@ -129,8 +129,8 @@ static IssSensorIntfParams     oto206SensorIntfPrms = {
 };
 
 IssSensorConfig     oto206SensorRegConfig = {
-    ub9xxDesCfg_OTO206,     /*desCfgPreScript*/
-    ub9xxSerCfg_OTO206,      /*serCfgPreScript*/
+    ub9xxDesCfg_OTO206,		/*NULL, desCfgPreScript, UB960*/
+    ub9xxSerCfg_OTO206,		/*serCfgPreScript, UB953*/
     NULL,      /*sensorCfgPreScript*/
     ub9xxOTO206DesCSI2Enable,        /*desCfgPostScript*/
     NULL,                    /*serCfgPostScript*/
@@ -171,6 +171,12 @@ int32_t IssSensor_oto206_Init()
 
 static int32_t oto206_Probe(uint32_t chId, void *pSensorHdl)
 {
+	/*
+		Probe is used only for detecting cameras connected to an FPD Link port. 
+		There is no reliable way of detecting this camera. 
+		Always return -1 to indicate autodetect failed.
+		If needed, user can manually select this sensor from application menu.
+	*/
     int32_t status = -1;
     return (status);
 }
@@ -184,21 +190,26 @@ static int32_t oto206_Config(uint32_t chId, void *pSensorHdl, uint32_t sensor_fe
     uint32_t i2cInstId;
     IssSensors_Handle * pSenHandle = (IssSensors_Handle*)pSensorHdl;
     IssSensor_CreateParams * pCreatePrms;
-	uint8_t chNum = 0, i2cAddr = 0;
+
     assert(NULL != pSenHandle);
     pCreatePrms = pSenHandle->createPrms;
     assert(NULL != pCreatePrms);
 
-    deserCfg =oto206SensorRegConfig.desCfgPreScript;
+    deserCfg = oto206SensorRegConfig.desCfgPreScript;
     serCfg = oto206SensorRegConfig.serCfgPreScript;
+    
+#if 1 // def MD_HW_CONFIG_ADCE // MD modify
+	uint8_t chNum = 0, i2cAddr = 0;
 	if(ub9xxInstanceId < 0)
     {
         printf("oto206_Config Invalid ub960InstanceId \n");
         return -1;
     }
 	Board_fpdU960GetI2CAddr(&chNum, &i2cAddr, ub9xxInstanceId);
-printf("Jireh: func:%s(), line:%d, chNum:%d, i2cAddr:%d\n", __FUNCTION__, __LINE__, chNum, i2cAddr);
     i2cInstId = (uint32_t)chNum;
+#else	// original
+    i2cInstId = pCreatePrms->i2cInstId;
+#endif
 
     if(NULL != deserCfg)
     {

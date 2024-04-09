@@ -70,7 +70,7 @@ I2cParams ub9xxDesCfg_OTO206[OTO206_DES_CFG_SIZE] = {
 
     /*TI960 4 input port,one output port*/
     {0x01, 0x02, 0x1},  /*digital reset include registers*/
-    {0x1f, 0x01, 0x1},  /*0x02 800Mhz, 0x03 400Mhz,00 1.6GHz,01 1.2GHz*/
+    {0x1f, 0x02, 0x1},  /*0x02 800Mhz, 0x03 400Mhz,00 1.6GHz,01 1.2GHz*/
     {0xbc, 0x00, 0x1},
 		
 	/*RX0 VC=0*/
@@ -80,7 +80,7 @@ I2cParams ub9xxDesCfg_OTO206[OTO206_DES_CFG_SIZE] = {
 	{0x7c, 0xc0, 0x1},   /*8-bit processing using lower 8 bits*/
     /*{0x5b, 0xba, 0x1},    //this field is normally loaded automatically from remote Serializer*/
     {0x5c, SER_0_I2C_ALIAS, 0x1},
-    {0x5d, 0x20, 0x1},    /*sensor physical IIC address*/
+    {0x5d, 0x20, 0x1},    /* sensor physical IIC address*/
     {0x65, SENSOR_0_I2C_ALIAS, 0x1},
     {0x70, 0x1e, 0x1},
 	
@@ -124,10 +124,21 @@ I2cParams ub9xxDesCfg_OTO206[OTO206_DES_CFG_SIZE] = {
     {0xFFFF, 0x00, 0x0} /*End of script */
 };
 
+#if 1	// MD modify, workaround & bypass
 #define OTO206_SER_CFG_SIZE    (1U)
 I2cParams ub9xxSerCfg_OTO206[OTO206_SER_CFG_SIZE] = {
     {0xFFFF, 0x00, 0x0} /*End of script */
 };
+#else   // original config, but it can't wirte.
+#define OTO206_SER_CFG_SIZE    (5U)
+I2cParams ub9xxSerCfg_OTO206[OTO206_SER_CFG_SIZE] = {
+    {0x0E, 0xF0, 0xF0},
+    {0x0D, 0xF0, 0x60},
+    {0x0D, 0xB0, 0x60},
+    {0x0D, 0xB4, 0x60},
+    {0xFFFF, 0x00, 0x0} /*End of script */
+};
+#endif
 
 I2cParams ub9xxOTO206DesCSI2Enable[10u] = {
     {0x33, 0x03, 0x1},
