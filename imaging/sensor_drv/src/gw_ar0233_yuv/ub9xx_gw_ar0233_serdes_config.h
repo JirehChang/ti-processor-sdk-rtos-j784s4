@@ -65,6 +65,12 @@
 #define GW_AR0233_OUT_WIDTH           (1920U)
 #define GW_AR0233_OUT_HEIGHT          (1080U)
 
+#if 1	// MD modify, workaround & bypass, 2023/1/4 a
+#define GW_AR0233_SER_CFG_SIZE (1U)
+I2cParams ub9xxSerCfg_GW_AR0233[GW_AR0233_SER_CFG_SIZE] = {
+    {0xFFFF, 0x00, 0x0} /*End of script */
+};
+#else   // original config, but it can't wirte.
 #define GW_AR0233_SER_CFG_SIZE    (5U)
 I2cParams ub9xxSerCfg_GW_AR0233[GW_AR0233_SER_CFG_SIZE] = {
     {0x0E, 0xF0, 0xF0},
@@ -73,6 +79,7 @@ I2cParams ub9xxSerCfg_GW_AR0233[GW_AR0233_SER_CFG_SIZE] = {
     {0x0D, 0xB4, 0x60},
     {0xFFFF, 0x00, 0x0} /*End of script */
 };
+#endif
 
 I2cParams ub9xxGW_AR0233DesCSI2Enable[10u] = {
     {0x33, 0x03, 0x1},

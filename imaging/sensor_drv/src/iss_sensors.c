@@ -1060,6 +1060,7 @@ static int32_t IssSensor_DeserializerInit(/*uint8_t *mask*/)
         return status;
     }
 
+#if 0	// MD remove, 2023/3/6 c
     if(desInitDone == 0)
     {
         status = initFusion2_UB97x();
@@ -1074,7 +1075,7 @@ static int32_t IssSensor_DeserializerInit(/*uint8_t *mask*/)
         desInitDone = 0;
 
     }
-
+#endif 
     /* UB960 Global configuration is done here which should be shared by all sensors*/
     /* Sensor driver is not supposed to overwrite global configuration*/
     /* Sensor driver can only modify the page corresponding to the channel ID selected*/
@@ -1631,7 +1632,7 @@ int32_t ub960_cfgScript(I2cParams *script, int8_t ub960InstanceId)
         Board_fpdU960GetI2CAddr(&ub960I2cInstId, &ub960I2cAddr, ub960InstanceId);
     }
 
-    issLogPrintf("UB960 config start \n");
+    issLogPrintf("UB960 config ub960rx_%d start \n", ub960InstanceId);
     if(NULL != script)
     {
         cnt = 0;
@@ -1644,7 +1645,7 @@ int32_t ub960_cfgScript(I2cParams *script, int8_t ub960InstanceId)
             regValue = script[cnt].nRegValue;
             delayMilliSec = script[cnt].nDelay;
             status |= UB960_WriteReg(ub960I2cInstId, ub960I2cAddr, regAddr, regValue);
-
+			printf(" ub960_cfgScript: status = %d, InstId = %d, ub960I2cAddr = 0x%x, regAddr = 0x%x, regValue = 0x%x\n", status, ub960I2cInstId, ub960I2cAddr, regAddr, regValue);	// MD add, for debug
             if (0 != status)
             {
                 printf(" UB960 Error: Reg Write Failed for regAddr %x, cnt = %d\n", regAddr, cnt);
@@ -1659,7 +1660,7 @@ int32_t ub960_cfgScript(I2cParams *script, int8_t ub960InstanceId)
             cnt++;
         }
     }
-    issLogPrintf("End of UB960 config \n");
+    issLogPrintf("End of UB960 config ub960rx_%d done\n", ub960InstanceId);
     return (status);
 }
 
@@ -2107,8 +2108,9 @@ int32_t ImageSensor_RemoteServiceHandler(char *service_name, uint32_t cmd,
                 return -1;
             }
 
-            IssSensor_DeserializerInit();
-            
+	// MD modify, 2023/3/6 c
+            status = IssSensor_DeserializerInit();  // initial DES of CSI0 & CSI1
+            if(0 == status)
             {
                 uint8_t count;
                 for(count=0;count<ISS_SENSORS_MAX_SUPPORTED_SENSOR;count++)
@@ -2120,7 +2122,7 @@ int32_t ImageSensor_RemoteServiceHandler(char *service_name, uint32_t cmd,
                     }
                 }
             }
-            status = 0;
+            //status = 0;	// MD remove, 2023/3/6 c
 
             break;
         case IM_SENSOR_CMD_QUERY:
@@ -2163,7 +2165,7 @@ int32_t ImageSensor_RemoteServiceHandler(char *service_name, uint32_t cmd,
             else
             {
                 status = 0;
-                int32_t probeStatus;
+//                int32_t probeStatus;	// MD remove
                 //channel_mask_supported = (1<<pSenHndl->createPrms->num_channels) - 1;
                 //channel_mask &= channel_mask_supported;
                 if(1U == pSenHndl->sensorIntfPrms->sensorBroadcast)
@@ -2203,13 +2205,14 @@ int32_t ImageSensor_RemoteServiceHandler(char *service_name, uint32_t cmd,
                     {
                         if((channel_mask & 0x1) == 0x1)
                         {
-                            probeStatus = pSenHndl->sensorFxns->probe(chId, pSenHndl);
+                            // MD remove, it can't probe, 2023/3/6 c, to check !!!
+                           /* probeStatus = pSenHndl->sensorFxns->probe(chId, pSenHndl);
                             if(probeStatus < 0)
                             {
                                 printf("Error : sensor probe failed for channel %d \n ", chId);
                                 status |= probeStatus;
                              }
-                             else
+                             else*/
                              {
                                 issLogPrintf("Configuring camera # %d \n", chId);
                                 status |= IssSensor_Config((void*)pSenHndl, chId, sensor_features_requested);

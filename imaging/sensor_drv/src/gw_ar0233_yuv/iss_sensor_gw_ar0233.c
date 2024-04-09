@@ -64,7 +64,7 @@
 
 static IssSensor_CreateParams  gw_ar0233CreatePrms = {
     GW_AR0233_UYVY,     /*sensor name*/
-    0x6,                             /*i2cInstId*/
+    0x6,                             /*i2cInstId, MD note, CSI0=0x3, CSI1=0x6 */
     {0, 0, 0, 0, 0, 0, 0, 0},   /*i2cAddrSensor*/
     {0, 0, 0, 0, 0, 0, 0, 0},      /*i2cAddrSer*/
     /*IssSensor_Info*/
@@ -88,7 +88,7 @@ static IssSensor_CreateParams  gw_ar0233CreatePrms = {
         {0, 0, 0, 0},                   /*dataLanesPolarity*/
         CSIRX_LANE_BAND_SPEED_720_TO_800_MBPS, /*csi_laneBandSpeed*/
     },
-    1,                                  /*numChan*/
+    8,                                  /*numChan, MD modify, 2023/3/6 a */
     5233,                                /*dccId*/
 };
 
