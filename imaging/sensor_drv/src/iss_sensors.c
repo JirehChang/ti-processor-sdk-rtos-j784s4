@@ -1035,7 +1035,7 @@ static int32_t IssSensor_DeserializerInit(/*uint8_t *mask*/)
     }
     else
     {
-        issLogPrintf("Fusion1 Board configuration\n");
+        issLogPrintf("Fusion1 Board configuration\n");  // <= here, Jireh note
         gFusion2Det = vx_false_e;
     }
 
@@ -1047,7 +1047,7 @@ static int32_t IssSensor_DeserializerInit(/*uint8_t *mask*/)
                                 &ub960I2cInstId,
                                 &ub960I2cAddr);
     }
-    else
+    else    // <= here, Jireh note
     {
         Board_fpdU960GetI2CAddr(&ub960I2cInstId, &ub960I2cAddr, BOARD_CSI_INST_0);
     }
@@ -1083,7 +1083,7 @@ static int32_t IssSensor_DeserializerInit(/*uint8_t *mask*/)
     {
         status = ub960_cfgScript(ub9702DesCfg_Common, 0U);
     }
-    else
+    else    // <= CSI 0, here, Jireh note
     {
         status = ub960_cfgScript(ub960DesCfg_Common, 0U);
     }
@@ -1097,7 +1097,7 @@ static int32_t IssSensor_DeserializerInit(/*uint8_t *mask*/)
     {
         status = ub960_cfgScript(ub9702DesCfg_Common, 1U);
     }
-    else
+    else    // <= CSI 1, here, Jireh note
     {
         status = ub960_cfgScript(ub960DesCfg_Common, 1U);
     }
@@ -2108,9 +2108,11 @@ int32_t ImageSensor_RemoteServiceHandler(char *service_name, uint32_t cmd,
                 return -1;
             }
 
-	// MD modify, 2023/3/6 c
-            status = IssSensor_DeserializerInit();  // initial DES of CSI0 & CSI1
-            if(0 == status)
+	// back to original// MD modify, 2023/3/6 c
+            //status = IssSensor_DeserializerInit();  // initial DES of CSI0 & CSI1
+            //if(0 == status)
+            IssSensor_DeserializerInit();
+            
             {
                 uint8_t count;
                 for(count=0;count<ISS_SENSORS_MAX_SUPPORTED_SENSOR;count++)
@@ -2123,6 +2125,7 @@ int32_t ImageSensor_RemoteServiceHandler(char *service_name, uint32_t cmd,
                 }
             }
             //status = 0;	// MD remove, 2023/3/6 c
+            status = 0;
 
             break;
         case IM_SENSOR_CMD_QUERY:
@@ -2165,7 +2168,7 @@ int32_t ImageSensor_RemoteServiceHandler(char *service_name, uint32_t cmd,
             else
             {
                 status = 0;
-//                int32_t probeStatus;	// MD remove
+                int32_t probeStatus;	// back to original// MD remove
                 //channel_mask_supported = (1<<pSenHndl->createPrms->num_channels) - 1;
                 //channel_mask &= channel_mask_supported;
                 if(1U == pSenHndl->sensorIntfPrms->sensorBroadcast)
@@ -2205,14 +2208,14 @@ int32_t ImageSensor_RemoteServiceHandler(char *service_name, uint32_t cmd,
                     {
                         if((channel_mask & 0x1) == 0x1)
                         {
-                            // MD remove, it can't probe, 2023/3/6 c, to check !!!
-                           /* probeStatus = pSenHndl->sensorFxns->probe(chId, pSenHndl);
+                            // back to original // MD remove, it can't probe, 2023/3/6 c, to check !!!
+                            probeStatus = pSenHndl->sensorFxns->probe(chId, pSenHndl);
                             if(probeStatus < 0)
                             {
                                 printf("Error : sensor probe failed for channel %d \n ", chId);
                                 status |= probeStatus;
                              }
-                             else*/
+                             else
                              {
                                 issLogPrintf("Configuring camera # %d \n", chId);
                                 status |= IssSensor_Config((void*)pSenHndl, chId, sensor_features_requested);
